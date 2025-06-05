@@ -1,4 +1,3 @@
-import 'package:challenge_cardozo/src/app.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
