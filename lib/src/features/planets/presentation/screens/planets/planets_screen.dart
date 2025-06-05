@@ -1,12 +1,13 @@
-import 'package:challenge_cardozo/src/common_widgets/custom_dropdown.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import 'package:challenge_cardozo/src/common_widgets/custom_dropdown.dart';
 import 'package:challenge_cardozo/src/common_widgets/custom_loading_indicator.dart';
 import 'package:challenge_cardozo/src/common_widgets/custom_text_field.dart';
 import 'package:challenge_cardozo/src/features/planets/domain/planet.dart';
 import 'package:challenge_cardozo/src/features/planets/presentation/providers/providers.dart';
+import 'package:challenge_cardozo/src/features/planets/presentation/utils/favorite_toggle.dart';
 
 part 'widgets/planet_card.dart';
 
@@ -53,6 +54,11 @@ class _PlanetsScreenState extends ConsumerState<PlanetsScreen> {
     final planetsAsync = ref.watch(getPlanetsProvider);
     final sortField = ref.watch(sortFieldProvider);
     final searchText = ref.watch(searchTextProvider);
+    final userFavoritesAsync = ref.watch(getFavoritePlanetsProvider);
+    final userFavorites = userFavoritesAsync.maybeWhen(
+      data: (favorites) => favorites,
+      orElse: () => <String>[],
+    );
 
     if (controller.text != searchText) {
       controller.text = searchText;
@@ -63,9 +69,9 @@ class _PlanetsScreenState extends ConsumerState<PlanetsScreen> {
 
     return Column(
       children: [
-        const SizedBox(height: 10),
+        const SizedBox(height: 20),
         SizedBox(
-          width: MediaQuery.of(context).size.width * 0.9,
+          width: MediaQuery.of(context).size.width * 0.95,
           child: CustomTextField(
             controller: controller,
             suffixIcon: Icon(Icons.search),
@@ -73,38 +79,43 @@ class _PlanetsScreenState extends ConsumerState<PlanetsScreen> {
             hintText: 'Enter planet name',
           ),
         ),
-        const SizedBox(height: 10),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.end,
-          children: [
-            const Text('Sort by:'),
-            const SizedBox(width: 10),
-            CustomDropdown<PlanetSortField>(
-              value: sortField,
-              onChanged: (value) {
-                if (value != null) {
-                  ref.read(sortFieldProvider.notifier).state = value;
-                }
-              },
-              items: const [
-                DropdownMenuItem(
-                  value: PlanetSortField.name,
-                  child: Text('Name'),
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 10),
+          child: Row(
+            children: [
+              const SizedBox(width: 10),
+              const Text('- Planet list -'),
+              Expanded(child: const SizedBox()),
+              const Text('Sort by:'),
+              const SizedBox(width: 10),
+              ConstrainedBox(
+                constraints: BoxConstraints(maxHeight: 50, maxWidth: 110),
+                child: CustomDropdown<PlanetSortField>(
+                  value: sortField,
+                  onChanged: (value) {
+                    if (value != null) {
+                      ref.read(sortFieldProvider.notifier).state = value;
+                    }
+                  },
+                  items: const [
+                    DropdownMenuItem(
+                      value: PlanetSortField.name,
+                      child: Text('Name'),
+                    ),
+                    DropdownMenuItem(
+                      value: PlanetSortField.mass,
+                      child: Text('Mass'),
+                    ),
+                    DropdownMenuItem(
+                      value: PlanetSortField.distance,
+                      child: Text('Distance'),
+                    ),
+                  ],
                 ),
-                DropdownMenuItem(
-                  value: PlanetSortField.mass,
-                  child: Text('Mass'),
-                ),
-                DropdownMenuItem(
-                  value: PlanetSortField.distance,
-                  child: Text('Distance'),
-                ),
-              ],
-            ),
-            const SizedBox(width: 10),
-          ],
+              ),
+            ],
+          ),
         ),
-        const SizedBox(height: 20),
         Expanded(
           child: planetsAsync.when(
             data: (planets) {
@@ -139,7 +150,10 @@ class _PlanetsScreenState extends ConsumerState<PlanetsScreen> {
                 itemCount: filtered.length,
                 itemBuilder: (context, index) {
                   final planet = filtered[index];
-                  return PlanetCard(planet: planet);
+                  return PlanetCard(
+                    planet: planet,
+                    isFavorite: userFavorites.contains(planet.name),
+                  );
                 },
               );
             },

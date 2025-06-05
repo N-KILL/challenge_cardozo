@@ -14,6 +14,7 @@ class HomeScreen extends ConsumerWidget {
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
+        Image.asset('assets/images/tres_a_logo.png', width: 300, height: 300),
         Text('Welcome to the Planet Visualizer!'),
         SizedBox(height: 20),
         CustomButton(

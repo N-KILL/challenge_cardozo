@@ -6,7 +6,7 @@ part of 'theme_provider.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$themeModeNotifierHash() => r'19e3d187e86b5d6f43bce9d723c3ebf36dceacd1';
+String _$themeModeNotifierHash() => r'4cffbf810e3688d23e4d7bf986798205e4ad3da4';
 
 /// A notifier that manages the theme mode of the application.
 /// It allows toggling between light and dark modes.

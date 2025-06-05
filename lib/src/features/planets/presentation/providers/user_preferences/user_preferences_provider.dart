@@ -12,19 +12,13 @@ Future<List<String>> getFavoritePlanets(Ref ref) async {
 }
 
 @riverpod
-Future<void> addFavoritePlanet(
-  Ref ref,
-  String planetId,
-) async {
+Future<void> addFavoritePlanet(Ref ref, String planetId) async {
   final repo = UserPreferencesRepository();
   await repo.addFavoritePlanet(planetId);
 }
 
 @riverpod
-Future<void> removeFavoritePlanet(
-  Ref ref,
-  String planetId,
-) async {
+Future<void> removeFavoritePlanet(Ref ref, String planetId) async {
   final repo = UserPreferencesRepository();
   await repo.removeFavoritePlanet(planetId);
 }
