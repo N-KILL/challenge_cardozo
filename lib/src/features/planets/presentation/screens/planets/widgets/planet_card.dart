@@ -11,12 +11,12 @@ class PlanetCard extends StatelessWidget {
   Widget build(BuildContext context) {
     // Register the web image view type if running on web
     // This allows the image to be displayed correctly on web without CORS issues.
-    // registerWebImageViewTypeIfNeeded(
-    //   '${planet.name}-card',
-    //   planet.image,
-    //   80,
-    //   80,
-    // );
+    registerWebImageViewTypeIfNeeded(
+      '${planet.name}-card',
+      planet.image,
+      80,
+      80,
+    );
 
     return GestureDetector(
       onTap: () {
@@ -33,54 +33,64 @@ class PlanetCard extends StatelessWidget {
               ClipRRect(
                 borderRadius: BorderRadius.circular(12),
                 child:
-                // Note this is a fix, to use the images on web, avoiding
-                // CORS policy.
-                // kIsWeb
-                //     ? SizedBox(
-                //       height: 80,
-                //       width: 80,
-                //       child: HtmlElementView(
-                //         viewType:
-                //             'planet-image-${planet.name}-card',
-                //       ),
-                //     )
-                //     :
-                Image.network(
-                  planet.image,
-                  width: 80,
-                  height: 80,
-                  fit: BoxFit.cover,
-                  loadingBuilder: (context, child, loadingProgress) {
-                    if (loadingProgress == null) return child;
-                    return Container(
-                      width: 80,
-                      height: 80,
-                      color: Colors.grey[200],
-                      child: const Center(
-                        child: Icon(Icons.public, size: 40, color: Colors.grey),
-                      ),
-                    );
-                  },
-                  errorBuilder: (context, error, stackTrace) {
-                    return Container(
-                      width: 80,
-                      height: 80,
-                      color: Colors.grey[300],
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: const [
-                          Icon(Icons.public, size: 40, color: Colors.grey),
-                          SizedBox(height: 4),
-                          Text(
-                            'No image',
-                            style: TextStyle(fontSize: 10, color: Colors.grey),
-                            textAlign: TextAlign.center,
+                    // Note this is a fix, to use the images on web, avoiding
+                    // CORS policy.
+                    kIsWeb
+                        ? SizedBox(
+                          height: 80,
+                          width: 80,
+                          child: HtmlElementView(
+                            viewType:
+                                'planet-image-${planet.name}-card',
                           ),
-                        ],
-                      ),
-                    );
-                  },
-                ),
+                        )
+                        : Image.network(
+                          planet.image,
+                          width: 80,
+                          height: 80,
+                          fit: BoxFit.cover,
+                          loadingBuilder: (context, child, loadingProgress) {
+                            if (loadingProgress == null) return child;
+                            return Container(
+                              width: 80,
+                              height: 80,
+                              color: Colors.grey[200],
+                              child: const Center(
+                                child: Icon(
+                                  Icons.public,
+                                  size: 40,
+                                  color: Colors.grey,
+                                ),
+                              ),
+                            );
+                          },
+                          errorBuilder: (context, error, stackTrace) {
+                            return Container(
+                              width: 80,
+                              height: 80,
+                              color: Colors.grey[300],
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: const [
+                                  Icon(
+                                    Icons.public,
+                                    size: 40,
+                                    color: Colors.grey,
+                                  ),
+                                  SizedBox(height: 4),
+                                  Text(
+                                    'No image',
+                                    style: TextStyle(
+                                      fontSize: 10,
+                                      color: Colors.grey,
+                                    ),
+                                    textAlign: TextAlign.center,
+                                  ),
+                                ],
+                              ),
+                            );
+                          },
+                        ),
               ),
               const SizedBox(width: 16),
               Expanded(
