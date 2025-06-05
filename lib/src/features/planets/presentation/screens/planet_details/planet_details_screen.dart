@@ -1,132 +1,159 @@
-import 'package:challenge_cardozo/src/utils/web_image_utils.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import 'package:challenge_cardozo/src/common_widgets/custom_loading_indicator.dart';
 import 'package:challenge_cardozo/src/features/planets/presentation/providers/providers.dart';
+import 'package:challenge_cardozo/src/features/planets/presentation/utils/favorite_toggle.dart';
 
 /// A Screen that displays details of a planet.
 class PlanetDetailsScreen extends ConsumerWidget {
   const PlanetDetailsScreen({super.key, required this.planetName});
 
+  /// The name of the planet to display details for.
   final String planetName;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final planetsAsync = ref.watch(getPlanetByNameProvider(planetName));
+    final userFavoritesAsync = ref.watch(getFavoritePlanetsProvider);
+    final userFavorites = userFavoritesAsync.maybeWhen(
+      data: (favorites) => favorites,
+      orElse: () => <String>[],
+    );
+    final isFavorite = userFavorites.contains(planetName);
 
     return planetsAsync.when(
       data: (planet) {
         if (planet == null) {
-          context.go('planet/not-found');
+          Future.microtask(() {
+            if (context.mounted) {
+              context.go('/not-found');
+            }
+          });
           return const SizedBox.shrink();
         }
 
-        // Register the web image view type if running on web
-        // This allows the image to be displayed correctly on web without CORS issues.
-        registerWebImageViewTypeIfNeeded(
-          '${planet.name}-details',
-          planet.image,
-          400,
-          400,
-        );
-
-        return Column(
-          children: [
-            AppBar(
-              centerTitle: true,
-              title: Text(
-                planet.name.toUpperCase(),
-                style: const TextStyle(
-                  fontSize: 24,
-                  fontWeight: FontWeight.bold,
+        return SingleChildScrollView(
+          child: Column(
+            children: [
+              AppBar(
+                centerTitle: true,
+                title: Text(
+                  planet.name.toUpperCase(),
+                  style: const TextStyle(
+                    fontSize: 24,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
-              ),
-              actions: [
-                IconButton(onPressed: () {}, icon: const Icon(Icons.favorite)),
-              ],
-            ),
-
-            Padding(
-              padding: const EdgeInsets.all(16),
-              child: Container(
-                decoration: BoxDecoration(
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withAlpha(25),
-                      blurRadius: 16,
-                      offset: const Offset(0, 8),
+                actions: [
+                  IconButton(
+                    icon: Icon(
+                      isFavorite ? Icons.favorite : Icons.favorite_border,
                     ),
-                  ],
-                ),
-                child:
-                    kIsWeb
-                        ? Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            HtmlElementView(
-                              viewType: 'planet-image-${planet.name}-details',
-                            ),
-                          ],
-                        )
-                        : Image.network(
-                          planet.image,
-                          width: MediaQuery.of(context).size.width * 0.7,
-                          height: MediaQuery.of(context).size.width * 0.7,
-                          fit: BoxFit.cover,
-                          loadingBuilder: (context, child, loadingProgress) {
-                            if (loadingProgress == null) return child;
-                            return const CustomLoadingIndicator(size: 100);
-                          },
-                        ),
+                    onPressed: () async {
+                      await toggleFavoritePlanet(
+                        context: context,
+                        ref: ref,
+                        planetName: planet.name,
+                        isFavorite: isFavorite,
+                      );
+                    },
+                  ),
+                ],
               ),
-            ),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16),
-              child: SizedBox(
-                child: SingleChildScrollView(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        planet.description,
-                        style: const TextStyle(fontSize: 16),
+
+              Padding(
+                padding: const EdgeInsets.all(24),
+                child: Container(
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(16),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withAlpha(100),
+                        blurRadius: 14,
                       ),
-                      const SizedBox(height: 16),
-                      Text('Orbital distance: ${planet.orbitalDistanceKm} km'),
-                      Text(
-                        'Equatorial radius: ${planet.equatorialRadiusKm} km',
-                      ),
-                      Text('Mass: ${planet.massKg} kg'),
-                      Text('Density: ${planet.densityGCm3} g/cm³'),
-                      Text('Surface gravity: ${planet.surfaceGravityMS2} m/s²'),
-                      Text('Escape velocity: ${planet.escapeVelocityKmh} km/h'),
-                      Text('Day length: ${planet.dayLengthEarthDays} days'),
-                      if (planet.yearLengthEarthDays != null)
-                        Text('Year length: ${planet.yearLengthEarthDays} days'),
-                      if (planet.yearLengthEarthYears != null)
-                        Text(
-                          'Year length: ${planet.yearLengthEarthYears} years',
-                        ),
-                      Text('Orbital speed: ${planet.orbitalSpeedKmh} km/h'),
-                      Text('Atmosphere: ${planet.atmosphereComposition}'),
-                      Text('Moons: ${planet.moons}'),
-                      const SizedBox(height: 24),
                     ],
+                  ),
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(16),
+                    child: Image.network(
+                      planet.image,
+                      width: MediaQuery.of(context).size.height * 0.35,
+                      height: MediaQuery.of(context).size.height * 0.35,
+                      fit: BoxFit.cover,
+                      loadingBuilder: (context, child, loadingProgress) {
+                        if (loadingProgress == null) return child;
+                        return const CustomLoadingIndicator(size: 100);
+                      },
+                    ),
                   ),
                 ),
               ),
-            ),
-          ],
+              Padding(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 8,
+                ),
+                child: Container(
+                  decoration: BoxDecoration(
+                    color: Theme.of(context).colorScheme.surface,
+                    borderRadius: BorderRadius.circular(8),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withAlpha(100),
+                        blurRadius: 14,
+                        offset: const Offset(0, 8),
+                      ),
+                    ],
+                  ),
+                  child: Padding(
+                    padding: const EdgeInsets.all(16),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          planet.description,
+                          style: const TextStyle(fontSize: 16),
+                        ),
+                        const SizedBox(height: 16),
+                        Text(
+                          'Orbital distance: ${planet.orbitalDistanceKm} km',
+                        ),
+                        Text(
+                          'Equatorial radius: ${planet.equatorialRadiusKm} km',
+                        ),
+                        Text('Mass: ${planet.massKg} kg'),
+                        Text('Density: ${planet.densityGCm3} g/cm³'),
+                        Text(
+                          'Surface gravity: ${planet.surfaceGravityMS2} m/s²',
+                        ),
+                        Text(
+                          'Escape velocity: ${planet.escapeVelocityKmh} km/h',
+                        ),
+                        Text('Day length: ${planet.dayLengthEarthDays} days'),
+                        if (planet.yearLengthEarthDays != null)
+                          Text(
+                            'Year length: ${planet.yearLengthEarthDays} days',
+                          ),
+                        if (planet.yearLengthEarthYears != null)
+                          Text(
+                            'Year length: ${planet.yearLengthEarthYears} years',
+                          ),
+                        Text('Orbital speed: ${planet.orbitalSpeedKmh} km/h'),
+                        Text('Atmosphere: ${planet.atmosphereComposition}'),
+                        Text('Moons: ${planet.moons}'),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
         );
       },
-      loading:
-          () => const Scaffold(body: Center(child: CustomLoadingIndicator())),
-      error:
-          (error, stack) =>
-              Scaffold(body: Center(child: Text('Error: $error'))),
+      loading: () => Center(child: CustomLoadingIndicator()),
+      error: (error, stack) => Center(child: Text('Error: $error')),
     );
   }
 }

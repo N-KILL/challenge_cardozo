@@ -55,50 +55,53 @@ class _State extends State<CustomTextField> {
 
   @override
   Widget build(BuildContext context) {
-    return TextField(
-      controller: widget.controller,
-      obscureText: obscureText,
-      keyboardType: widget.keyboardType,
-      minLines: widget.minLines,
-      maxLines: widget.maxLines,
-      autofocus: false,
-      enabled: widget.enabled,
-      decoration: InputDecoration(
-        labelText: widget.label,
-        hintText: widget.hintText,
-        border: OutlineInputBorder(),
-        prefixIcon: widget.prefixIcon,
-        suffixIcon:
-            widget.isPasswordField
-                ? IconButton(
-                  icon: Icon(
-                    obscureText ? Icons.visibility : Icons.visibility_off,
+    return Material(
+      elevation: 4,
+      color: Colors.transparent,
+      child: TextField(
+        controller: widget.controller,
+        obscureText: obscureText,
+        keyboardType: widget.keyboardType,
+        minLines: widget.minLines,
+        maxLines: widget.maxLines,
+        autofocus: false,
+        enabled: widget.enabled,
+        decoration: InputDecoration(
+          labelText: widget.label,
+          hintText: widget.hintText,
+          prefixIcon: widget.prefixIcon,
+          suffixIcon:
+              widget.isPasswordField
+                  ? IconButton(
+                    icon: Icon(
+                      obscureText ? Icons.visibility : Icons.visibility_off,
+                    ),
+                    onPressed: () {
+                      setState(() {
+                        obscureText = !obscureText;
+                      });
+                    },
+                  )
+                  : widget.controller.text.isEmpty
+                  ? widget.suffixIcon
+                  : IconButton(
+                    onPressed: () {
+                      setState(() {
+                        widget.controller.clear();
+                      });
+                    },
+                    icon: const Icon(Icons.clear),
                   ),
-                  onPressed: () {
-                    setState(() {
-                      obscureText = !obscureText;
-                    });
-                  },
-                )
-                : widget.controller.text.isEmpty
-                ? widget.suffixIcon
-                : IconButton(
-                  onPressed: () {
-                    setState(() {
-                      widget.controller.clear();
-                    });
-                  },
-                  icon: const Icon(Icons.clear),
-                ),
+        ),
+        style: TextStyle(fontSize: 16, color: Colors.black),
+        cursorColor: Colors.blue,
+        onChanged: (value) {
+          setState(() {}); // Para actualizar el sufijo cuando cambia el texto
+          if (widget.onChanged != null) {
+            widget.onChanged!(value);
+          }
+        },
       ),
-      style: TextStyle(fontSize: 16, color: Colors.black),
-      cursorColor: Colors.blue,
-      onChanged: (value) {
-        setState(() {}); // Para actualizar el sufijo cuando cambia el texto
-        if (widget.onChanged != null) {
-          widget.onChanged!(value);
-        }
-      },
     );
   }
 }

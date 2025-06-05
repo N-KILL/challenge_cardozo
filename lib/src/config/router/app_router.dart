@@ -41,16 +41,13 @@ GoRouter appRouter(Ref ref) {
                       return PlanetDetailsScreen(planetName: planet);
                     },
                   ),
-                  // TODO(CARDOZO): Add a route for not found planets
-                  GoRoute(
-                    path: ':not-found',
-                    builder: (context, state) {
-                      return const Scaffold(
-                        body: Center(child: Text('Planet not found')),
-                      );
-                    },
-                  ),
                 ],
+              ),
+              GoRoute(
+                path: '/not-found',
+                builder: (context, state) {
+                  return const NotFoundScreen();
+                },
               ),
             ],
           ),

@@ -3,7 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:challenge_cardozo/src/config/config.dart';
-import 'package:challenge_cardozo/src/config/theme/theme_data.dart';
+import 'package:challenge_cardozo/src/config/theme/app_theme_data.dart';
 import 'package:challenge_cardozo/src/config/theme/theme_provider.dart';
 
 /// The main entry point of the application.

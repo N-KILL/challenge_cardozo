@@ -18,34 +18,30 @@ class CustomAppBar extends ConsumerWidget implements PreferredSizeWidget {
     final themeMode = ref.watch(themeModeNotifierProvider);
     final isDark = themeMode == ThemeMode.dark;
 
-    return AppBar(
-      leading: IconButton(
-        icon: const Icon(Icons.home, color: Colors.white),
-        onPressed: () {
-          context.go('/home');
-        },
-      ),
-      title: const Text(
-        'PLANET VISUALIZER',
-        style: TextStyle(
-          color: Colors.white,
-          fontSize: 20,
-          fontWeight: FontWeight.bold,
-        ),
-      ),
-      centerTitle: true,
-      actions: [
-        IconButton(
-          icon: Icon(
-            isDark ? Icons.light_mode : Icons.dark_mode,
-            color: Colors.white,
-          ),
-          tooltip: isDark ? 'Switch to light mode' : 'Switch to dark mode',
+    return Material(
+      elevation: 4,
+      child: AppBar(
+        leading: IconButton(
+          icon: const Icon(Icons.home),
           onPressed: () {
-            ref.read(themeModeNotifierProvider.notifier).toggleTheme();
+            context.go('/home');
           },
         ),
-      ],
+        title: const Text(
+          'PLANET VISUALIZER',
+          style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+        ),
+        centerTitle: true,
+        actions: [
+          IconButton(
+            icon: Icon(isDark ? Icons.light_mode : Icons.dark_mode),
+            tooltip: isDark ? 'Switch to light mode' : 'Switch to dark mode',
+            onPressed: () {
+              ref.read(themeModeNotifierProvider.notifier).toggleTheme();
+            },
+          ),
+        ],
+      ),
     );
   }
 }
