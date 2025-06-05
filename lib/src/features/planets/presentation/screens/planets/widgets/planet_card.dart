@@ -13,6 +13,15 @@ class PlanetCard extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    if (kIsWeb) {
+      registerWebImageViewTypeIfNeeded(
+        '${planet.name}-card',
+        planet.image,
+        80,
+        80,
+      );
+    }
+
     return GestureDetector(
       onTap: () {
         context.go('/planets/${planet.name}');
@@ -27,53 +36,68 @@ class PlanetCard extends ConsumerWidget {
             children: [
               ClipRRect(
                 borderRadius: BorderRadius.circular(12),
-                child: Image.network(
-                  planet.image,
-                  width: 80,
-                  height: 80,
-                  fit: BoxFit.cover,
-                  loadingBuilder: (context, child, loadingProgress) {
-                    if (loadingProgress == null) return child;
-                    return Container(
-                      width: 80,
-                      height: 80,
-                      color: Theme.of(context).colorScheme.tertiary,
-                      child: Center(
-                        child: Icon(
-                          Icons.public,
-                          size: 40,
-                          color: Theme.of(context).colorScheme.tertiary,
+                child:
+                    kIsWeb
+                        ? SizedBox(
+                          height: 80,
+                          width: 80,
+                          child: HtmlElementView(
+                            viewType: 'planet-image-${planet.name}-card',
+                          ),
+                        )
+                        : Image.network(
+                          planet.image,
+                          width: 80,
+                          height: 80,
+                          fit: BoxFit.cover,
+                          loadingBuilder: (context, child, loadingProgress) {
+                            if (loadingProgress == null) return child;
+                            return Container(
+                              width: 80,
+                              height: 80,
+                              color: Theme.of(context).colorScheme.tertiary,
+                              child: Center(
+                                child: Icon(
+                                  Icons.public,
+                                  size: 40,
+                                  color: Theme.of(context).colorScheme.tertiary,
+                                ),
+                              ),
+                            );
+                          },
+                          errorBuilder: (context, error, stackTrace) {
+                            return Container(
+                              width: 80,
+                              height: 80,
+                              color: Theme.of(context).colorScheme.tertiary,
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Icon(
+                                    Icons.public,
+                                    size: 40,
+                                    color:
+                                        Theme.of(
+                                          context,
+                                        ).colorScheme.onTertiary,
+                                  ),
+                                  SizedBox(height: 4),
+                                  Text(
+                                    'No image',
+                                    style: TextStyle(
+                                      fontSize: 10,
+                                      color:
+                                          Theme.of(
+                                            context,
+                                          ).colorScheme.onTertiary,
+                                    ),
+                                    textAlign: TextAlign.center,
+                                  ),
+                                ],
+                              ),
+                            );
+                          },
                         ),
-                      ),
-                    );
-                  },
-                  errorBuilder: (context, error, stackTrace) {
-                    return Container(
-                      width: 80,
-                      height: 80,
-                      color: Theme.of(context).colorScheme.tertiary,
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Icon(
-                            Icons.public,
-                            size: 40,
-                            color: Theme.of(context).colorScheme.onTertiary,
-                          ),
-                          SizedBox(height: 4),
-                          Text(
-                            'No image',
-                            style: TextStyle(
-                              fontSize: 10,
-                              color: Theme.of(context).colorScheme.onTertiary,
-                            ),
-                            textAlign: TextAlign.center,
-                          ),
-                        ],
-                      ),
-                    );
-                  },
-                ),
               ),
               const SizedBox(width: 16),
               Expanded(

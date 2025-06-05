@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -8,6 +9,7 @@ import 'package:challenge_cardozo/src/common_widgets/custom_text_field.dart';
 import 'package:challenge_cardozo/src/features/planets/domain/planet.dart';
 import 'package:challenge_cardozo/src/features/planets/presentation/providers/providers.dart';
 import 'package:challenge_cardozo/src/features/planets/presentation/utils/favorite_toggle.dart';
+import 'package:challenge_cardozo/src/utils/web_image_utils.dart';
 
 part 'widgets/planet_card.dart';
 

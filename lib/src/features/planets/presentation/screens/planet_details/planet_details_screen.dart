@@ -1,3 +1,5 @@
+import 'package:challenge_cardozo/src/utils/web_image_utils.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -22,7 +24,7 @@ class PlanetDetailsScreen extends ConsumerWidget {
       orElse: () => <String>[],
     );
     final isFavorite = userFavorites.contains(planetName);
-
+    final imageSize = MediaQuery.of(context).size.height * 0.35;
     return planetsAsync.when(
       data: (planet) {
         if (planet == null) {
@@ -32,6 +34,15 @@ class PlanetDetailsScreen extends ConsumerWidget {
             }
           });
           return const SizedBox.shrink();
+        }
+
+        if (kIsWeb) {
+          registerWebImageViewTypeIfNeeded(
+            '${planet.name}-detail',
+            planet.image,
+            imageSize.toInt(),
+            imageSize.toInt(),
+          );
         }
 
         return SingleChildScrollView(
@@ -66,6 +77,8 @@ class PlanetDetailsScreen extends ConsumerWidget {
               Padding(
                 padding: const EdgeInsets.all(24),
                 child: Container(
+                  width: imageSize,
+                  height: imageSize,
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(16),
                     boxShadow: [
@@ -77,16 +90,25 @@ class PlanetDetailsScreen extends ConsumerWidget {
                   ),
                   child: ClipRRect(
                     borderRadius: BorderRadius.circular(16),
-                    child: Image.network(
-                      planet.image,
-                      width: MediaQuery.of(context).size.height * 0.35,
-                      height: MediaQuery.of(context).size.height * 0.35,
-                      fit: BoxFit.cover,
-                      loadingBuilder: (context, child, loadingProgress) {
-                        if (loadingProgress == null) return child;
-                        return const CustomLoadingIndicator(size: 100);
-                      },
-                    ),
+                    child:
+                        kIsWeb
+                            ? HtmlElementView(
+                              viewType: 'planet-image-${planet.name}-detail',
+                            )
+                            : Image.network(
+                              planet.image,
+                              width: imageSize,
+                              height: imageSize,
+                              fit: BoxFit.cover,
+                              loadingBuilder: (
+                                context,
+                                child,
+                                loadingProgress,
+                              ) {
+                                if (loadingProgress == null) return child;
+                                return const CustomLoadingIndicator(size: 100);
+                              },
+                            ),
                   ),
                 ),
               ),
