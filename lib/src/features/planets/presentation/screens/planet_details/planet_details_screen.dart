@@ -1,5 +1,3 @@
-import 'package:challenge_cardozo/src/utils/web_image_utils.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -23,15 +21,6 @@ class PlanetDetailsScreen extends ConsumerWidget {
           context.go('planet/not-found');
           return const SizedBox.shrink();
         }
-
-        // Register the web image view type if running on web
-        // This allows the image to be displayed correctly on web without CORS issues.
-        // registerWebImageViewTypeIfNeeded(
-        //   '${planet.name}-details',
-        //   planet.image,
-        //   400,
-        //   400,
-        // );
 
         return Column(
           children: [
@@ -61,27 +50,16 @@ class PlanetDetailsScreen extends ConsumerWidget {
                     ),
                   ],
                 ),
-                child:
-                    // kIsWeb
-                    //     ? Row(
-                    //       mainAxisAlignment: MainAxisAlignment.center,
-                    //       children: [
-                    //         HtmlElementView(
-                    //           viewType: 'planet-image-${planet.name}-details',
-                    //         ),
-                    //       ],
-                    //     )
-                    //     : 
-                        Image.network(
-                          planet.image,
-                          width: MediaQuery.of(context).size.width * 0.7,
-                          height: MediaQuery.of(context).size.width * 0.7,
-                          fit: BoxFit.cover,
-                          loadingBuilder: (context, child, loadingProgress) {
-                            if (loadingProgress == null) return child;
-                            return const CustomLoadingIndicator(size: 100);
-                          },
-                        ),
+                child: Image.network(
+                  planet.image,
+                  width: MediaQuery.of(context).size.width * 0.7,
+                  height: MediaQuery.of(context).size.width * 0.7,
+                  fit: BoxFit.cover,
+                  loadingBuilder: (context, child, loadingProgress) {
+                    if (loadingProgress == null) return child;
+                    return const CustomLoadingIndicator(size: 100);
+                  },
+                ),
               ),
             ),
             Padding(

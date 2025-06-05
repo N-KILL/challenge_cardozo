@@ -9,15 +9,6 @@ class PlanetCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Register the web image view type if running on web
-    // This allows the image to be displayed correctly on web without CORS issues.
-    // registerWebImageViewTypeIfNeeded(
-    //   '${planet.name}-card',
-    //   planet.image,
-    //   80,
-    //   80,
-    // );
-
     return GestureDetector(
       onTap: () {
         context.go('/planets/${planet.name}');
@@ -32,20 +23,7 @@ class PlanetCard extends StatelessWidget {
             children: [
               ClipRRect(
                 borderRadius: BorderRadius.circular(12),
-                child:
-                // Note this is a fix, to use the images on web, avoiding
-                // CORS policy.
-                // kIsWeb
-                //     ? SizedBox(
-                //       height: 80,
-                //       width: 80,
-                //       child: HtmlElementView(
-                //         viewType:
-                //             'planet-image-${planet.name}-card',
-                //       ),
-                //     )
-                //     :
-                Image.network(
+                child: Image.network(
                   planet.image,
                   width: 80,
                   height: 80,
