@@ -38,9 +38,7 @@ all modules are divided by features - data(Repositories)/domain(Entities)/presen
 [https://challenge-tres-astronautas.web.app](https://challenge-tres-astronautas.web.app)
 
 ### Notes
-Due to CORS policy and the free version firebase, I can't configure the app to read some images. Web version has "No image" 
-on some of the planets. Android version from the repository works fine. Also there is other branch in this repository 
-which have the web version of the app avoiding CORS on local.
+There's two branches, main and web. The only difference is web, have a dependency to read the images in the web 
+app version, avoiding the CORS policy. That is not required on the android or desktop app. So just use the main version
 
-This can be fixed using own services for the images, like cloudinary for load images on a custom storage, or just having 
-firebase storage (which is from paid). I apologize for that.
+The deployed web is working with fine with the images 
